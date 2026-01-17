@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>時計ウィジェットメーカー</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 32px;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    .preview-section {
+      background: #e0e0e0;
+      border-radius: 20px;
+      padding: 60px 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+    }
+    .clock-preview {
+      background: #ffaf00;
+      padding: 30px 40px;
+      border-radius: 20px;
+      text-align: center;
+    }
+    .preview-date {
+      font-size: 22px;
+      color: white;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .preview-time {
+      font-size: 56px;
+      font-weight: bold;
+      color: white;
+      letter-spacing: 2px;
+    }
+    .settings-section {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .settings-title {
+      font-size: 20px;
+      color: #7c7c7c;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .settings-title::before {
+      content: '⚙️';
+    }
+    .form-group {
+      margin-bottom: 30px;
+    }
+    .form-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .color-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .color-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .color-input-group label {
+      font-size: 13px;
+      color: #666;
+    }
+    .color-picker-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input[type="color"] {
+      width: 50px;
+      height: 50px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: monospace;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #ffaf00;
+    }
+    .generate-section {
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 2px solid #f0f0f0;
+    }
+    .generate-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .generate-label::before {
+      content: '🔗';
+    }
+    .generate-btn {
+      width: 100%;
+      padding: 18px;
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .generate-btn:hover {
+      background: #4f46e5;
+    }
+    .url-output {
+      margin-top: 15px;
+      padding: 16px;
+      background: #f7f7f7;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      color: #666;
+      display: none;
+    }
+    .url-output.show {
+      display: block;
+    }
+    .copy-btn {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .copy-btn:hover {
+      background: #16a34a;
+    }
+    .note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: #999;
+    }
+    @media (max-width: 768px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>時計ウィジェットメーカー</h1>
+    
+    <div class="main">
+      <!-- プレビュー -->
+      <div class="preview-section">
+        <div class="clock-preview" id="clockPreview">
+          <div class="preview-date" id="previewDate"></div>
+          <div class="preview-time" id="previewTime"></div>
+        </div>
+      </div>
+      
+      <!-- 設定 -->
+      <div class="settings-section">
+        <div class="settings-title">設定</div>
+        
+        <div class="form-group">
+          <div class="form-label">🎨 カラー設定</div>
+          <div class="color-inputs">
+            <div class="color-input-group">
+              <label>背景色</label>
+              <div class="color-picker-wrapper">
+                <input type="color" id="bgColorPicker" value="#ffaf00">
+                <input type="text" id="bgColorInput" value="#ffaf00" maxlength="7">
+              </div>
+            </div>
+            <div class="color-input-group">
+              <label>文字色</label>
+              <div class="color-picker-wrapper">
+                <input type="color" id="textColorPicker" value="#ffffff">
+                <input type="text" id="textColorInput" value="#ffffff" maxlength="7">
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="generate-section">
+          <div class="generate-label">埋め込みURL生成</div>
+          <button class="generate-btn" onclick="generateURL()">URLを生成</button>
+          <div class="url-output" id="urlOutput"></div>
+          <button class="copy-btn" id="copyBtn" style="display:none;" onclick="copyURL()">URLをコピー</button>
+          <div class="note">※ 生成されたURLをコピーして埋め込みに使用してください</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // プレビュー時計の更新
+    function updatePreviewClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('previewTime').textContent = `${hours}:${minutes}`;
+      
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+      const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+      const weekday = weekdays[now.getDay()];
+      document.getElementById('previewDate').textContent = `${year}/${month}/${date} (${weekday})`;
+    }
+    
+    updatePreviewClock();
+    setInterval(updatePreviewClock, 1000);
+    
+    // カラーピッカーと入力欄の同期
+    const bgColorPicker = document.getElementById('bgColorPicker');
+    const bgColorInput = document.getElementById('bgColorInput');
+    const textColorPicker = document.getElementById('textColorPicker');
+    const textColorInput = document.getElementById('textColorInput');
+    const clockPreview = document.getElementById('clockPreview');
+    
+    function updatePreview() {
+      const bgColor = bgColorInput.value;
+      const textColor = textColorInput.value;
+      clockPreview.style.background = bgColor;
+      document.querySelectorAll('.preview-date, .preview-time').forEach(el => {
+        el.style.color = textColor;
+      });
+    }
+    
+    bgColorPicker.addEventListener('input', (e) => {
+      bgColorInput.value = e.target.value;
+      updatePreview();
+    });
+    
+    bgColorInput.addEventListener('input', (e) => {
+      let value = e.target.value;
+      if (!value.startsWith('#')) value = '#' + value;
+      bgColorPicker.value = value;
+      updatePreview();
+    });
+    
+    textColorPicker.addEventListener('input', (e) => {
+      textColorInput.value = e.target.value;
+      updatePreview();
+    });
+    
+    textColorInput.addEventListener('input', (e) => {
+      let value = e.target.value;
+      if (!value.startsWith('#')) value = '#' + value;
+      textColorPicker.value = value;
+      updatePreview();
+    });
+    
+    // URL生成
+    function generateURL() {
+      const bgColor = bgColorInput.value.replace('#', '');
+      const textColor = textColorInput.value.replace('#', '');
+      
+      // ここのベースURLは実際のGitHub PagesのURLに置き換えてください
+      const baseURL = 'https://icetabetai0403.github.io/clock-widgets/custom/';
+      const generatedURL = `${baseURL}?bg=${bgColor}&text=${textColor}`;
+      
+      const urlOutput = document.getElementById('urlOutput');
+      const copyBtn = document.getElementById('copyBtn');
+      
+      urlOutput.textContent = generatedURL;
+      urlOutput.classList.add('show');
+      copyBtn.style.display = 'block';
+    }
+    
+    // URLコピー
+    function copyURL() {
+      const urlOutput = document.getElementById('urlOutput');
+      navigator.clipboard.writeText(urlOutput.textContent).then(() => {
+        const copyBtn = document.getElementById('copyBtn');
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'コピーしました！';
+        copyBtn.style.background = '#10b981';
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+          copyBtn.style.background = '#22c55e';
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
