@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: transparent;
+      font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .clock-container {
+      background: #ffaf00;
+      padding: 30px 40px;
+      border-radius: 20px;
+      text-align: center;
+    }
+    .date {
+      font-size: 22px;
+      color: white;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .time {
+      font-size: 56px;
+      font-weight: bold;
+      color: white;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock-container">
+    <div>
+      <div class="date" id="date"></div>
+    </div>
+    <div>
+      <div class="time" id="time"></div>
+    </div>
+  </div>
+  <script>
+    // URLパラメータから色を取得
+    const params = new URLSearchParams(window.location.search);
+    const bgColor = params.get('bg') || 'ffaf00';
+    const textColor = params.get('text') || 'ffffff';
+    
+    // 色を適用
+    document.querySelector('.clock-container').style.background = '#' + bgColor;
+    document.querySelectorAll('.date, .time').forEach(el => {
+      el.style.color = '#' + textColor;
+    });
+    
+    function updateClock() {
+      const now = new Date();
+      
+      // 時刻（秒なし）
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('time').textContent = `${hours}:${minutes}`;
+      
+      // 日付と曜日
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+      const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+      const weekday = weekdays[now.getDay()];
+      document.getElementById('date').textContent = `${year}/${month}/${date} (${weekday})`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
